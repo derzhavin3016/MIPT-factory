@@ -5,7 +5,6 @@
 #include <SPI.h>
 #include <nRF24L01.h>
 
-
 constexpr int channelNum = 7;
 constexpr unsigned long long pipeAddr = 0x1234567890LL;
 

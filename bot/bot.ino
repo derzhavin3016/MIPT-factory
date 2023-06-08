@@ -17,7 +17,12 @@ public:
     servo_.attach(pin);
   }
 
-  auto writeAngle(int angle) -> decltype(servo_.write(-1))
+  int read()
+  {
+    return servo_.read();
+  }
+
+  auto write(int angle) -> decltype(servo_.write(-1))
   {
     return servo_.write(angle);
   }
@@ -27,17 +32,17 @@ constexpr int SERVO_PIN = 9;
 
 void setup()
 {
-  Serial.begin(9600);
+  // Serial.begin(9600);
 
-  setup_radio(radio_gugu);
-  radio_gugu.openReadingPipe(1, pipeAddr);
-  radio_gugu.startListening();
+  // setup_radio(radio_gugu);
+  // radio_gugu.openReadingPipe(1, pipeAddr);
+  // radio_gugu.startListening();
 
   // motor pins
   for (int i = 4; i < 8; ++i)
     pinMode(i, OUTPUT);
 
-  Serial.println("RADIO GUGU START");
+  // Serial.println("RADIO GUGU START");
 
   serv.attach(SERVO_PIN);
 }
@@ -47,11 +52,26 @@ constexpr int DIR_1 = 4;
 constexpr int SPEED_2 = 6;
 constexpr int DIR_2 = 7;
 
+constexpr int DEFAULT_ANGLE = 100;
+constexpr int ROT_ANGLE = 50;
+constexpr int RIGHT_ROT = DEFAULT_ANGLE + ROT_ANGLE;
+constexpr int LEFT_ROT = DEFAULT_ANGLE - ROT_ANGLE;
+
 void loop()
 {
-  static int ang = 360;
-  serv.writeAngle(ang);
-  ang *= -1;
+  digitalWrite(DIR_1, HIGH);
+  analogWrite(SPEED_1, 255);
+  digitalWrite(DIR_2, HIGH);
+  analogWrite(SPEED_2, 255);
+
+  auto curAngle = 0;//serv.read();
+  auto rotAngle = 180;
+  static int rotated = 0;
+  if (!rotated) {
+    serv.write(RIGHT_ROT);
+    rotated = 1;
+  }
+  // ang *= -1;
   delay(3000);
 
   if (!radio_gugu.available())
