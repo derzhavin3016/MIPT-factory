@@ -6,6 +6,11 @@ RF24 radio_gugu(9, 10);
 constexpr unsigned DATA_SIZE = 5;
 int data[DATA_SIZE];
 
+constexpr int DEFAULT_ANGLE = 100;
+constexpr int ROT_ANGLE = 50;
+constexpr int RIGHT_ROT = DEFAULT_ANGLE + ROT_ANGLE;
+constexpr int LEFT_ROT = DEFAULT_ANGLE - ROT_ANGLE;
+
 struct ServAngle
 {
 private:
@@ -17,14 +22,19 @@ public:
     servo_.attach(pin);
   }
 
-  int read()
+  void noRotate()
   {
-    return servo_.read();
+    servo_.write(DEFAULT_ANGLE);
   }
 
-  auto write(int angle) -> decltype(servo_.write(-1))
+  void rotateRight()
   {
-    return servo_.write(angle);
+    servo_.write(RIGHT_ROT);
+  }
+
+  void rotateLeft()
+  {
+    servo_.write(LEFT_ROT);
   }
 } serv;
 
@@ -52,25 +62,24 @@ constexpr int DIR_1 = 4;
 constexpr int SPEED_2 = 6;
 constexpr int DIR_2 = 7;
 
-constexpr int DEFAULT_ANGLE = 100;
-constexpr int ROT_ANGLE = 50;
-constexpr int RIGHT_ROT = DEFAULT_ANGLE + ROT_ANGLE;
-constexpr int LEFT_ROT = DEFAULT_ANGLE - ROT_ANGLE;
-
 void loop()
 {
-  digitalWrite(DIR_1, HIGH);
-  analogWrite(SPEED_1, 255);
-  digitalWrite(DIR_2, HIGH);
-  analogWrite(SPEED_2, 255);
+  serv.noRotate();
+  processDir(Dir::FORWARD, 255);
 
-  auto curAngle = 0;//serv.read();
-  auto rotAngle = 180;
-  static int rotated = 0;
-  if (!rotated) {
-    serv.write(RIGHT_ROT);
-    rotated = 1;
-  }
+  // digitalWrite(DIR_1, HIGH);
+  // analogWrite(SPEED_1, 255);
+  // digitalWrite(DIR_2, HIGH);
+  // analogWrite(SPEED_2, 255);
+
+  // auto curAngle = 0; // serv.read();
+  // auto rotAngle = 180;
+  // static int rotated = 0;
+  // if (!rotated)
+  // {
+  //   serv.write(RIGHT_ROT);
+  //   rotated = 1;
+  // }
   // ang *= -1;
   delay(3000);
 
@@ -101,16 +110,16 @@ void processDir(int dir, int spd)
   switch (dir)
   {
   case Dir::FORWARD:
-    setEngine(HIGH, LOW, spd);
+    setEngine(LOW, LOW, spd);
     break;
   case Dir::BACKWARD:
-    setEngine(LOW, HIGH, spd);
-    break;
-  case Dir::RIGHT:
     setEngine(HIGH, HIGH, spd);
     break;
+  case Dir::RIGHT:
+    setEngine(HIGH, LOW, spd);
+    break;
   case Dir::LEFT:
-    setEngine(LOW, LOW, spd);
+    setEngine(LOW, HIGH, spd);
     break;
   default:
     setEngine(HIGH, HIGH, 0);
