@@ -64,9 +64,9 @@ void loop()
 
   auto rot_angle = 0;
   if (yPosition > DEAD_HIGH)
-    rot_angle = map(yPosition, DEAD_HIGH, 1023, DEFAULT_ANGLE, RIGHT_ROT);
+    rot_angle = map(yPosition, DEAD_HIGH, 1023, LEFT_ROT, DEFAULT_ANGLE);
   else if (yPosition < DEAD_LOW)
-    rot_angle = map(yPosition, 0, DEAD_LOW, LEFT_ROT, DEFAULT_ANGLE);
+    rot_angle = map(yPosition, 0, DEAD_LOW, DEFAULT_ANGLE, RIGHT_ROT);
 
 
   data[0] = direction;
