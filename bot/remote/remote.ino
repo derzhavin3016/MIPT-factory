@@ -62,12 +62,7 @@ void loop()
     speed = 0;
   }
 
-  auto rot_angle = 0;
-  if (yPosition > DEAD_HIGH)
-    rot_angle = map(yPosition, DEAD_HIGH, 1023, LEFT_ROT, DEFAULT_ANGLE);
-  else if (yPosition < DEAD_LOW)
-    rot_angle = map(yPosition, 0, DEAD_LOW, DEFAULT_ANGLE, RIGHT_ROT);
-
+  auto rot_angle = map(yPosition, 0, 1023, LEFT_ROT, RIGHT_ROT);
 
   data[0] = direction;
   data[1] = speed;
@@ -81,5 +76,5 @@ void loop()
   // Serial.println(ptmrState);
 
   // Serial.println(speed);
-  delay(100);
+  // delay(100);
 }
