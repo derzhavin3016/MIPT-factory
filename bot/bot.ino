@@ -4,12 +4,7 @@
 RF24 radio_gugu(9, 10);
 
 constexpr unsigned DATA_SIZE = 5;
-int data[DATA_SIZE];
-
-constexpr int DEFAULT_ANGLE = 100;
-constexpr int ROT_ANGLE = 50;
-constexpr int RIGHT_ROT = DEFAULT_ANGLE + ROT_ANGLE;
-constexpr int LEFT_ROT = DEFAULT_ANGLE - ROT_ANGLE;
+int data[DATA_SIZE];// = {-1, -1};
 
 struct ServAngle
 {
@@ -36,23 +31,29 @@ public:
   {
     servo_.write(LEFT_ROT);
   }
+
+  void rotate(int angle)
+  {
+    if (angle <= RIGHT_ROT && angle >= LEFT_ROT)
+      servo_.write(angle);
+  }
 } serv;
 
-constexpr int SERVO_PIN = 9;
+constexpr int SERVO_PIN = 8;
 
 void setup()
 {
-  // Serial.begin(9600);
+  Serial.begin(9600);
 
-  // setup_radio(radio_gugu);
-  // radio_gugu.openReadingPipe(1, pipeAddr);
-  // radio_gugu.startListening();
+  setup_radio(radio_gugu);
+  radio_gugu.openReadingPipe(1, pipeAddr);
+  radio_gugu.startListening();
 
   // motor pins
   for (int i = 4; i < 8; ++i)
     pinMode(i, OUTPUT);
 
-  // Serial.println("RADIO GUGU START");
+  Serial.println("RADIO GUGU START");
 
   serv.attach(SERVO_PIN);
 }
@@ -64,36 +65,24 @@ constexpr int DIR_2 = 7;
 
 void loop()
 {
-  serv.noRotate();
-  processDir(Dir::FORWARD, 255);
-
-  // digitalWrite(DIR_1, HIGH);
-  // analogWrite(SPEED_1, 255);
-  // digitalWrite(DIR_2, HIGH);
-  // analogWrite(SPEED_2, 255);
-
-  // auto curAngle = 0; // serv.read();
-  // auto rotAngle = 180;
-  // static int rotated = 0;
-  // if (!rotated)
-  // {
-  //   serv.write(RIGHT_ROT);
-  //   rotated = 1;
-  // }
-  // ang *= -1;
-  delay(3000);
+  static int def = 0;
+  if (!def)
+    serv.noRotate(), def = 1;
 
   if (!radio_gugu.available())
     return;
 
   radio_gugu.read(&data, sizeof(data));
   Serial.println("RADIO GUGU");
+  Serial.println(data[0]);
+  Serial.println(data[1]);
 
-  auto btnState = data[2];
+  auto rot_angle = data[2];
   auto tmblrState = data[3];
   auto ptmrVal = data[4];
 
   processDir(data[0], data[1]);
+  serv.rotate(rot_angle);
 }
 
 void setEngine(int dir1, int dir2, int spd)

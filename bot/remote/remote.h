@@ -8,6 +8,11 @@
 constexpr int channelNum = 7;
 constexpr unsigned long long pipeAddr = 0x1234567890LL;
 
+constexpr int DEFAULT_ANGLE = 100;
+constexpr int ROT_ANGLE = 50;
+constexpr int RIGHT_ROT = DEFAULT_ANGLE + ROT_ANGLE;
+constexpr int LEFT_ROT = DEFAULT_ANGLE - ROT_ANGLE;
+
 struct DataType
 {
   enum DTypes : int
